@@ -14,7 +14,7 @@ runs:
       name: Kill vpn
       shell: bash
       run: |
-        sudo chmod 777 vpn.log
+        sudo chmod 777 .github/vpn.log
         sudo killall openvpn
 
     - name: Upload VPN logs
@@ -22,4 +22,4 @@ runs:
       if: ${{ inputs.debug == true }}
       with:
         name: VPN logs
-        path: vpn.log
+        path: .github/vpn.log
