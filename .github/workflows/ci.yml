@@ -50,7 +50,7 @@ jobs:
       
       - uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh_private_key: ${{ secrets.ssh_private_key }}
+          ssh-private-key: ${{ secrets.ssh_private_key }}
 
       - id: build-and-test
         name: Build test and lint application
