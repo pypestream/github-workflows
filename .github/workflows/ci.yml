@@ -34,10 +34,12 @@ jobs:
         uses: pypestream/github-workflows/.github/actions/start-vpn@master
         with:
           vpn_profile: ${{ secrets.vpn_profile }}
-          registry_url: ${{ inputs.registry_url }}
+          registry_url: ${{ secrets.registry_url }}
 
       - id: check-vpn
         name: Checking VPN connection
+        with:
+          registry_url: ${{ secrets.registry_url }}
         run: |
           IS_VPN_CONNECTED=${{ steps.vpn.outputs.IS_VPN_CONNECTED }}
           if [ ${IS_VPN_CONNECTED} -eq false ]; then
