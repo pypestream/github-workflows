@@ -2,6 +2,11 @@ name: Build Test and Lint
 
 on:
   workflow_call:
+    inputs:
+      debug:
+        type: boolean
+        required: false
+        default: false
     secrets:
       registry_url:
         required: true
@@ -59,4 +64,4 @@ jobs:
         name: Stops VPN
         uses: pypestream/github-workflows/.github/actions/stop-vpn@master
         with:
-          debug: true
+          debug: ${{ inputs.debug }}
