@@ -27,7 +27,7 @@ jobs:
 
       - id: vpn
         name: Setting up VPN
-        uses: pypestream/github-workflows/.github/workflows/actions/start-vpn
+        uses: pypestream/github-workflows/.github/workflows/actions/start-vpn@master
         with:
           vpn-profile: ${{ secrets.vpn-profile }}
           registry-url: ${{ inputs.registry-url }}
@@ -58,6 +58,6 @@ jobs:
 
       - id: vpn-disconnect
         name: Stops VPN
-        uses: pypestream/github-workflows/actions/stop-vpn
+        uses: pypestream/github-workflows/actions/stop-vpn@master
         with:
           debug: true
