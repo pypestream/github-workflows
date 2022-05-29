@@ -67,7 +67,9 @@ jobs:
           fi
 
       - id: repo
-        run: echo ::set-env name=REPO_NAME::$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+        run: |
+          repo_name=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+          echo '::set-env name=REPO_NAME::$repo_name'
       
       - name: Build Docker Image
         env:
