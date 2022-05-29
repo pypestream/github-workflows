@@ -62,6 +62,7 @@ jobs:
 
       - id: vpn-disconnect
         name: Stops VPN
+        if: always()
         uses: pypestream/github-workflows/.github/actions/stop-vpn@master
         with:
           debug: ${{ inputs.debug }}
