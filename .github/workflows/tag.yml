@@ -84,4 +84,12 @@ jobs:
           docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
           make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
           docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest $IMAGE_NAME:${{ steps.vars.outputs.tag }}
+          docker push $IMAGE_NAME:${{ steps.vars.outputs.tag }}
+          
+      - id: vpn-disconnect
+        name: Post RUN Stops VPN
+        if: always()
+        uses: pypestream/github-workflows/.github/actions/stop-vpn@master
+        with:
+          debug: ${{ inputs.debug }}
       
