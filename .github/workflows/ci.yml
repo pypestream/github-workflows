@@ -11,7 +11,7 @@ on:
       vpn_profile:
         required: true
         description: VPN Profile that is used to connect to private infra
-      github_token:
+      gh_personal_access_token:
         required: true
       ssh_private_key:
         required: true
