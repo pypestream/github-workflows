@@ -2,17 +2,16 @@ name: Build Test and Lint
 
 on:
   workflow_call:
-    inputs:
+    secrets:
       registry_url:
         required: true
-        type: string
         description: Harbor registry url
-    secrets:
       vpn_profile:
         required: true
         description: VPN Profile that is used to connect to private infra
       gh_personal_access_token:
         required: true
+        description: Github token that can be used for building apps or adding comments to PR etc
       ssh_private_key:
         required: true
         description: Required private key to use ssh-agent for installing dependencies from github private repos.
