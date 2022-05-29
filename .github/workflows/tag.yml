@@ -13,6 +13,12 @@ on:
         default: false
         description: Enables debug logs for vpn
     secrets:
+      harbor_username:
+        required: true
+        description: Username for harbor registry
+      harbor_password:
+        required: true
+        description: Password for harbor registry
       registry_url:
         required: true
         description: Harbor registry url
@@ -75,6 +81,7 @@ jobs:
         env:
             IMAGE_NAME: ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}
         run: |
+          docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
           make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
           docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest $IMAGE_NAME:${{ steps.vars.outputs.tag }}
       
