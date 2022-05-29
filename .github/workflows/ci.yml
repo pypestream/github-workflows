@@ -3,17 +3,17 @@ name: Build Test and Lint
 on:
   workflow_call:
     inputs:
-      registry-url:
+      registry_url:
         required: true
         type: string
         description: Harbor registry url
     secrets:
-      vpn-profile:
+      vpn_profile:
         required: true
         description: VPN Profile that is used to connect to private infra
-      github-token:
+      github_token:
         required: true
-      ssh-private-key:
+      ssh_private_key:
         required: true
         description: Required private key to use ssh-agent for installing dependencies from github private repos.
 
@@ -29,8 +29,8 @@ jobs:
         name: Setting up VPN
         uses: pypestream/github-workflows/.github/actions/start-vpn@master
         with:
-          vpn-profile: ${{ secrets.vpn-profile }}
-          registry-url: ${{ inputs.registry-url }}
+          vpn_profile: ${{ secrets.vpn_profile }}
+          registry_url: ${{ inputs.registry_url }}
 
       - id: check-vpn
         name: Checking VPN connection
@@ -46,7 +46,7 @@ jobs:
       
       - uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.ssh-private-key }}
+          ssh_private_key: ${{ secrets.ssh_private_key }}
 
       - id: build-and-test
         name: Build test and lint application
@@ -58,6 +58,6 @@ jobs:
 
       - id: vpn-disconnect
         name: Stops VPN
-        uses: pypestream/github-workflows/.github/actions//stop-vpn@master
+        uses: pypestream/github-workflows/.github/actions/stop-vpn@master
         with:
           debug: true
