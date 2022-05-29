@@ -48,7 +48,7 @@ jobs:
       - id: repo
         run: |
           repo_name=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
-          echo '::set-env name=REPO_NAME::$repo_name'      
+          echo "::set-output name=REPO_NAME::$repo_name"
       - uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.ssh_private_key }}
