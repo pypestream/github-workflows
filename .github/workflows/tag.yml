@@ -50,7 +50,7 @@ jobs:
       - uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.ssh_private_key }}
-          - id: vpn
+      - id: vpn
         name: Setting up VPN
         uses: pypestream/github-workflows/.github/actions/start-vpn@master
         with:
