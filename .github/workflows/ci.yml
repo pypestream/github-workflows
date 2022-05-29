@@ -61,7 +61,7 @@ jobs:
           make lint image=${{ steps.repo.outputs.REPO_NAME }} version=latest || true
 
       - id: vpn-disconnect
-        name: Stops VPN
+        name: Post RUN Stops VPN
         if: always()
         uses: pypestream/github-workflows/.github/actions/stop-vpn@master
         with:
