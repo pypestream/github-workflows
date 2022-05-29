@@ -78,14 +78,12 @@ jobs:
           echo "::set-output name=REPO_NAME::$repo_name"
       
       - name: Build Docker Image
-        env:
-            IMAGE_NAME: ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}
         run: |
           docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
           make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
-          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest $IMAGE_NAME:${{ steps.vars.outputs.tag }}
-          docker push $IMAGE_NAME:${{ steps.vars.outputs.tag }}
-          
+          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
+
       - id: vpn-disconnect
         name: Post RUN Stops VPN
         if: always()
