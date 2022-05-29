@@ -1,0 +1,40 @@
+name: 'Setup VPN'
+description: 'Start and connect VPN'
+inputs:
+  debug:
+    required: false
+    description: If debug is set to true then VPN logs will be uploaded to job artifacts
+    default: "false"
+  vpn-profile:
+    description: 'VPN Profile'
+    required: true
+  registry-url:
+    description: Docker Registry link to verify if VPN connected and works
+    required: true
+outputs:
+  IS_VPN_CONNECTED:
+    description: "Returns true if VPN is connected otherwise false"
+    value: ${{ steps.connect-vpn.outputs.IS_VPN_CONNECTED }}
+runs:
+  using: "composite"
+  steps:
+
+    - id: setup-vpn
+      name: Setup VPN
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get --assume-yes --no-install-recommends install openvpn
+        echo "${{ inputs.vpn-config }}" > .github/vpn_client.ovpn
+
+    - id: connect-vpn
+      name: Connect VPN
+      shell: bash
+      run: |
+        sudo openvpn --config ".github/vpn_client.ovpn" --log "vpn.log" --daemon
+        http_code=$(curl -LI --connect-timeout 5 --max-time 10 --retry 10 --retry-delay 1 --retry-max-time 40 'https://${{ inputs.registry-url }}' -o /dev/null -w '%{http_code}\n' -s)
+        if [ ${http_code} -eq 200 ]; then
+            echo "::set-output name=IS_VPN_CONNECTED::true"
+        else
+            echo "::set-output name=IS_VPN_CONNECTED::false"
+        fi

@@ -1,0 +1,63 @@
+name: Build Test and Lint
+
+on:
+  workflow_call:
+    inputs:
+      registry-url:
+        required: true
+        type: string
+        description: Harbor registry url
+    secrets:
+      vpn-profile:
+        required: true
+        description: VPN Profile that is used to connect to private infra
+      github-token:
+        required: true
+      ssh-private-key:
+        required: true
+        description: Required private key to use ssh-agent for installing dependencies from github private repos.
+
+jobs:
+  build-and-test:
+    name: Build test and lint application
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - id: vpn
+        name: Setting up VPN
+        uses: pypestream/github-workflows/.github/workflows/actions/start-vpn
+        with:
+          vpn-profile: ${{ secrets.vpn-profile }}
+          registry-url: ${{ inputs.registry-url }}
+
+      - id: check-vpn
+        name: Checking VPN connection
+        run: |
+          IS_VPN_CONNECTED=${{ steps.vpn.outputs.IS_VPN_CONNECTED }}
+          if [ ${IS_VPN_CONNECTED} -eq false ]; then
+            echo "VPN is not connected so failing the job, please run this workflow with debug mode to see vpn logs in the artifacts"
+            exit 1
+          fi
+
+      - id: repo
+        run: echo "::set-output name=REPO_NAME::true"
+      
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.ssh-private-key }}
+
+      - id: build-and-test
+        name: Build test and lint application
+        run: |
+          make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          make build-test image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          make test image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          make lint image=${{ steps.repo.outputs.REPO_NAME }} version=latest || true
+
+      - id: vpn-disconnect
+        name: Stops VPN
+        uses: pypestream/github-workflows/actions/stop-vpn
+        with:
+          debug: true
