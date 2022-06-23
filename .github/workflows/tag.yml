@@ -7,6 +7,11 @@ on:
         required: true
         default: devops/docker_build
         description: Default base path for docker image to be pushed
+      repo_name:
+        type: string
+        required: false
+        default: default_repo
+        description: "Custom param for docker image repository name to push to"
       debug:
         type: boolean
         required: false
@@ -81,8 +86,18 @@ jobs:
         run: |
           docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
           make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          
+      - name: (Default) Push Docker Image To Registry
+        run: |
           docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
           docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
+        if: ${{ inputs.repo_name == 'default_repo' }}
+
+      - name: (Custom repository name) Push Docker Image To Registry
+        run: |
+          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ inputs.repo_name }}:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ inputs.repo_name }}:${{ steps.vars.outputs.tag }}
+        if: ${{ inputs.repo_name != 'default_repo' }}
 
       - id: vpn-disconnect
         name: Post RUN Stops VPN
