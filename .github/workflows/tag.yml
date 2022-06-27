@@ -94,14 +94,9 @@ jobs:
           else
               docker_tag=${{ inputs.repo_name }}
           fi
+          echo $docker_tag
           docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
           docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
-
-      - name: (Custom repository name) Push Docker Image To Registry
-        run: |
-          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ inputs.repo_name }}:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ inputs.repo_name }}:${{ steps.vars.outputs.tag }}
-        if: ${{ inputs.repo_name != 'default_repo' }}
 
       - id: vpn-disconnect
         name: Post RUN Stops VPN
