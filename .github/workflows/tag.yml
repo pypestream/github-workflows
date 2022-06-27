@@ -90,13 +90,13 @@ jobs:
       - name: Push Docker Image To Registry
         run: |
           if [ "${{ inputs.repo_name }}" == "default_repo" ]; then
-              docker_tag=${{ steps.repo.outputs.REPO_NAME }}
+              repo_name=${{ steps.repo.outputs.REPO_NAME }}
           else
-              docker_tag=${{ inputs.repo_name }}
+              repo_name=${{ inputs.repo_name }}
           fi
           echo $docker_tag
-          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
+          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest harbor-01-usa.pype.engineering/${{ inputs.base_image_path }}/$repo_name:${{ steps.vars.outputs.tag }}
+          docker push harbor-01-usa.pype.engineering/${{ inputs.base_image_path }}/$repo_name:${{ steps.vars.outputs.tag }}
 
       - id: vpn-disconnect
         name: Post RUN Stops VPN
