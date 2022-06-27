@@ -87,11 +87,15 @@ jobs:
           docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
           make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
           
-      - name: (Default) Push Docker Image To Registry
+      - name: Push Docker Image To Registry
         run: |
-          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/${{ steps.repo.outputs.REPO_NAME }}:${{ steps.vars.outputs.tag }}
-        if: ${{ inputs.repo_name == 'default_repo' }}
+          if [ "${{ inputs.repo_name }}" == "default_repo" ]; then
+              docker_tag=${{ steps.repo.outputs.REPO_NAME }}
+          else
+              docker_tag=${{ inputs.repo_name }}
+          fi
+          docker tag ${{ steps.repo.outputs.REPO_NAME }}:latest ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.registry_url }}/${{ inputs.base_image_path }}/$docker_tag:${{ steps.vars.outputs.tag }}
 
       - name: (Custom repository name) Push Docker Image To Registry
         run: |
