@@ -1,4 +1,4 @@
-name: Build bump tag
+name: Release
 
 on:
   workflow_call:
