@@ -11,6 +11,10 @@ on:
         type: string
         required: true
         default: "16"
+      workflow_run_conclusion:
+        type: string
+        required: true
+        description: Run only if github.event.workflow_run.conslusion is success
     secrets:
       gh_personal_access_token:
         required: true
@@ -19,7 +23,7 @@ on:
 jobs:
     publish-gpr:
         runs-on: ubuntu-latest
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        if: ${{ inputs.workflow_run_conclusion == 'success' }}
         permissions:
             packages: write
             contents: read
