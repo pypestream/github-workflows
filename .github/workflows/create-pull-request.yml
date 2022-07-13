@@ -24,23 +24,23 @@ on:
 
 jobs:
     publish-gpr:
-        runs-on: ubuntu-latest
-        permissions:
-            packages: write
-            contents: read
-       steps:
-        - uses: actions/checkout@v2
-        - id: branch_name
-          name: Get Branch Name
-          shell: bash
-          run:  echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        - name: pull-request
-          uses: repo-sync/pull-request@v2
-          with:
-            destination_branch: ${{ inputs.destination_branch }}
-            github_token: ${{ secrets.gh_personal_access_token }}
-            pr_title: "Merge ${{ steps.extract_branch.outputs.branch }} into ${{ inputs.destination_branch }}"
-            pr_body: "${{ github.event.head_commit.message }}"
-            pr_template: "${{ inputs.pr_template_file }}"
-            pr_draft: false
-            pr_allow_empty: false
+      runs-on: ubuntu-latest
+      permissions:
+          packages: write
+          contents: read
+      steps:
+      - uses: actions/checkout@v2
+      - id: branch_name
+        name: Get Branch Name
+        shell: bash
+        run:  echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: ${{ inputs.destination_branch }}
+          github_token: ${{ secrets.gh_personal_access_token }}
+          pr_title: "Merge ${{ steps.extract_branch.outputs.branch }} into ${{ inputs.destination_branch }}"
+          pr_body: "${{ github.event.head_commit.message }}"
+          pr_template: "${{ inputs.pr_template_file }}"
+          pr_draft: false
+          pr_allow_empty: false
