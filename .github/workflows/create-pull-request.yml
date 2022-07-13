@@ -30,7 +30,7 @@ jobs:
           contents: read
       steps:
       - uses: actions/checkout@v2
-      - id: branch_name
+      - id: extract_branch
         name: Get Branch Name
         shell: bash
         run:  echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
