@@ -1,0 +1,45 @@
+name: Build bump tag
+
+on:
+  workflow_call:
+    inputs:
+      debug:
+        type: boolean
+        required: false
+        default: false
+      node_version:
+        type: string
+        required: true
+        default: "16"
+    secrets:
+      gh_personal_access_token:
+        required: true
+        description: Github token that can be used for building apps or adding comments to PR etc
+
+jobs:
+    publish-gpr:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        permissions:
+            packages: write
+            contents: read
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ inputs.node_version }}
+                  registry-url: https://npm.pkg.github.com/
+            - name: Building Pypestream UI
+              env:
+                 NPM_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
+              run: |
+                cat <<EOF > ./.npmrc
+                @pypestream:registry = https://npm.pkg.github.com
+                //npm.pkg.github.com/:_authToken=${NPM_AUTH_TOKEN}
+                always-auth = true
+                EOF
+                npm install
+                npm run build
+            - run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
