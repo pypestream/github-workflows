@@ -39,7 +39,7 @@ jobs:
         with:
           destination_branch: ${{ inputs.destination_branch }}
           github_token: ${{ secrets.gh_personal_access_token }}
-          pr_title: "Merge ${{ steps.extract_branch.outputs.branch }} into ${{ inputs.destination_branch }}"
+          pr_title: " ${{ github.actor }} Merge ${{ steps.extract_branch.outputs.branch }} into ${{ inputs.destination_branch }}"
           pr_body: "${{ github.event.head_commit.message }}"
           pr_template: "${{ inputs.pr_template_file }}"
           pr_draft: false
