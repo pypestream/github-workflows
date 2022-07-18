@@ -56,8 +56,8 @@ jobs:
       - id: build-and-test
         name: Build test and lint application
         run: |
-          make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
-          make build-test image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest github_token=${{ secrets.gh_personal_access_token }}
+          make build-test image=${{ steps.repo.outputs.REPO_NAME }} version=latest github_token=${{ secrets.gh_personal_access_token }}
           make test image=${{ steps.repo.outputs.REPO_NAME }} version=latest
           make lint image=${{ steps.repo.outputs.REPO_NAME }} version=latest || true
 
