@@ -85,7 +85,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker login ${{ secrets.registry_url }} --username ${{ secrets.harbor_username }} --password ${{ secrets.harbor_password }}
-          make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest
+          make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest github_token=${{ secrets.gh_personal_access_token }}
           
       - name: Push Docker Image To Registry
         run: |
