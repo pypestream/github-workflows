@@ -101,7 +101,7 @@ jobs:
           run: |
             make build-review image=${{ steps.repo.outputs.REPO_NAME }} version=latest username=${{ secrets.surge_user }} password=${{ inputs.surge_password }} github_token=${{ secrets.gh_personal_access_token }}
             rm ./.npmrc
-            surge --project $(pwd)/build --domain ${{ steps.repo.outputs.REVIEW_APP_LINK }} --token ${{ secrets.surge_token }}
+            surge --project /build --domain ${{ steps.repo.outputs.REVIEW_APP_LINK }} --token ${{ secrets.surge_token }}
 
         - name: Add Review link in comments
           uses: mshick/add-pr-comment@v1
