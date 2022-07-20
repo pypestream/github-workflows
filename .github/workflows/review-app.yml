@@ -19,8 +19,6 @@ on:
       gh_personal_access_token:
         required: true
         description: Github token that can be used for building apps or adding comments to PR etc
-      gh_deploy_key:
-        required: false
       surge_user:
         required: true
         description: Review app username (basic auth)
@@ -60,6 +58,11 @@ jobs:
           fi
           review_link="$reponame-pr-${{ github.event.number }}.surge.sh"
           echo "::set-output name=REVIEW_APP_LINK::$review_link"
+          
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
 
       - name: Configure
         env:
