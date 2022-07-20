@@ -1,0 +1,132 @@
+name: Build bump tag
+
+on:
+  workflow_call:
+    inputs:
+      debug:
+        type: boolean
+        required: false
+        default: false
+      node_version:
+        type: string
+        required: true
+        default: "16"
+      repo_name:
+        type: string
+        required: false
+        default: default_repo
+    secrets:
+      gh_personal_access_token:
+        required: true
+        description: Github token that can be used for building apps or adding comments to PR etc
+      gh_deploy_key:
+        required: false
+      surge_user:
+        required: true
+        description: Review app username (basic auth)
+      surge_password:
+        required: true
+        description: Review app password (basic auth)
+      surge_token:
+        required: true
+        description: Surge deploy token
+      registry_url:
+        required: true
+        description: Harbor registry url
+      vpn_profile:
+        required: true
+        description: VPN Profile that is used to connect to private infra
+
+
+jobs:
+    create_review_app:
+      
+      # this job will only run if PR is opened/edited/synchronize/reopeneed
+      runs-on: ubuntu-latest
+      if: github.event.action != 'closed'
+      
+      name: Deploying to surge
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: reviewapp_link
+        run: |
+          github_repo=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+          if [ "${{ inputs.repo_name }}" == "default_repo" ]; then
+              repo_name=$github_repo
+          else
+              repo_name=${{ inputs.repo_name }}
+          fi
+          review_link="$reponame-pr-${{ github.event.number }}.surge.sh"
+          echo "::set-output name=REVIEW_APP_LINK::$review_link"
+
+      - name: Configure
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
+
+        run: |
+          sudo apt-get update && sudo apt-get install -y make jq
+          npm install -g surge
+          cat <<EOF > ./.npmrc
+          @pypestream:registry = https://npm.pkg.github.com
+          //npm.pkg.github.com/:_authToken=${NPM_AUTH_TOKEN}
+          always-auth = true
+          EOF
+
+      - id: vpn
+        name: Setting up VPN
+        uses: pypestream/github-workflows/.github/actions/start-vpn@master
+        with:
+          vpn_profile: ${{ secrets.vpn_profile }}
+          registry_url: ${{ secrets.registry_url }}
+
+      - id: check-vpn
+        name: Checking VPN connection
+        run: |
+          IS_VPN_CONNECTED=${{ steps.vpn.outputs.IS_VPN_CONNECTED }}
+          if [ ${IS_VPN_CONNECTED} -eq false ]; then
+            echo "VPN is not connected so failing the job, please run this workflow with debug mode to see vpn logs in the artifacts"
+            exit 1
+          fi
+      
+      - name: Build and Deploy application
+        run: |
+          make build image=$repo_name version=latest github_token=${{ secrets.gh_personal_access_token }}
+          make build-review image=$repo_name version=latest username=${{ secrets.surge_user }} password=${{ inputs.surge_password }} github_token=${{ secrets.gh_personal_access_token }}
+          rm ./.npmrc
+          surge --project $(pwd)/build --domain ${{ steps.repo.outputs.REVIEW_APP_LINK }} --token ${{ secrets.surge_token }}
+
+      - name: Add Review link in comments
+        uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            🌏 Review App Link:  https://${{ steps.repo.outputs.REVIEW_APP_LINK }}
+          repo-token: ${{ secrets.gh_personal_access_token }}
+          repo-token-user-login: "github-actions[bot]"
+          allow-repeats: false
+
+    stop_review:
+
+      # this job will only run if PR is merged and closed
+      runs-on: ubuntu-latest
+      if: github.event.action == 'closed'
+
+      name: Teardown review app
+
+      steps:
+        - uses: actions/checkout@v3
+
+        - id: reviewapp_link
+          run: |
+            github_repo=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+            if [ "${{ inputs.repo_name }}" == "default_repo" ]; then
+                repo_name=$github_repo
+            else
+                repo_name=${{ inputs.repo_name }}
+            fi
+            review_link="$reponame-pr-${{ github.event.number }}.surge.sh"
+            echo "::set-output name=REVIEW_APP_LINK::$review_link"
+
+        - name: Remove surge app for this PR
+          run: npx surge teardown ${{ steps.repo.outputs.REVIEW_APP_LINK }} --token ${{ secrets.surge_token }}
