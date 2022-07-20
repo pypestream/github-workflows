@@ -48,15 +48,19 @@ jobs:
       steps:
         - uses: actions/checkout@v3
 
+        - id: repo
+          run: |
+            repo_name=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
+            echo "::set-output name=REPO_NAME::$repo_name"
+
         - id: reviewapp_link
           run: |
-            github_repo=$(echo $GITHUB_REPOSITORY | awk -F / '{print $2}')
             if [ "${{ inputs.repo_name }}" == "default_repo" ]; then
-                repo_name=$github_repo
+                repo_name=${{ steps.repo.outputs.REPO_NAME }}
             else
                 repo_name=${{ inputs.repo_name }}
             fi
-            review_link="$reponame-pr-${{ github.event.number }}.surge.sh"
+            review_link="$repo_name-pr-${{ github.event.number }}.surge.sh"
             echo "::set-output name=REVIEW_APP_LINK::$review_link"
             
         - name: Setup Node
@@ -95,8 +99,8 @@ jobs:
         
         - name: Build and Deploy application
           run: |
-            make build image=$repo_name version=latest github_token=${{ secrets.gh_personal_access_token }}
-            make build-review image=$repo_name version=latest username=${{ secrets.surge_user }} password=${{ inputs.surge_password }} github_token=${{ secrets.gh_personal_access_token }}
+            make build image=${{ steps.repo.outputs.REPO_NAME }} version=latest github_token=${{ secrets.gh_personal_access_token }}
+            make build-review image=${{ steps.repo.outputs.REPO_NAME }} version=latest username=${{ secrets.surge_user }} password=${{ inputs.surge_password }} github_token=${{ secrets.gh_personal_access_token }}
             rm ./.npmrc
             surge --project $(pwd)/build --domain ${{ steps.repo.outputs.REVIEW_APP_LINK }} --token ${{ secrets.surge_token }}
 
