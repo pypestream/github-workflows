@@ -184,3 +184,49 @@ jobs:
     secrets:
       gh_personal_access_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
 ```
+## Review App (Create/destroy) `review-app.yml`
+This workflow will create review app for frontend applications and deploy them on surge.sh then add comment to the PR
+
+### Prerequisites
+
+- Secrets
+    - `registry_url` *
+    - `vpn_profile` *
+    - `gh_personal_access_token` *
+    - `surge_user` *
+    - `surge_password` *
+    - `surge_token` *
+
+- Inputs
+    - `node_version` *
+    - `repo_name` (Not Required)
+
+### Example
+```yaml
+name: Review App
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+jobs:
+
+  review-app:
+    uses: pypestream/github-workflows/.github/workflows/review-app.yml@master
+
+    with:
+      node_version: "14"
+
+    secrets:
+      registry_url: ${{ secrets.HARBOR_REGISTRY_URL }}
+      vpn_profile: ${{ secrets.INFRA_VPN_PROFILE }}
+      gh_personal_access_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      surge_user: <username>
+      surge_password: <password>
+      surge_token: ${{ secrets.SURGE_TOKEN }}
+
+```
