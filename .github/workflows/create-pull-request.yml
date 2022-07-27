@@ -28,7 +28,7 @@ on:
         description: Github token that can be used for building apps or adding comments to PR etc
 
 jobs:
-    publish-gpr:
+   create-pr:
       runs-on: ubuntu-latest
       permissions:
           packages: write
