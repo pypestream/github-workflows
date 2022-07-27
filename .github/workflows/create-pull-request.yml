@@ -17,13 +17,18 @@ on:
         default: ""
         required: false
         description: PR template
+      pr_label:
+        type: string
+        default: "Need Code Review"
+        required: false
+        description: Lables to add (comma separated list)
     secrets:
       gh_personal_access_token:
         required: true
         description: Github token that can be used for building apps or adding comments to PR etc
 
 jobs:
-    publish-gpr:
+    create-pr:
       runs-on: ubuntu-latest
       permissions:
           packages: write
@@ -44,3 +49,4 @@ jobs:
           pr_template: "${{ inputs.pr_template_file }}"
           pr_draft: false
           pr_allow_empty: false
+          pr_label: ${{ inputs.pr_label }}
