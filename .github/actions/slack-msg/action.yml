@@ -1,0 +1,39 @@
+name: 'Send Slack Message'
+description: 'Sends slack notification using external github action.'
+inputs:
+  slack_channel:
+    required: true
+    description: Slack channel name to send notification to
+  slack_color:
+    description: 'Message color'
+    required: false
+    default: ${{ job.status }}
+  slack_message:
+    required: true
+    description: Slack message to send
+  slack_title:
+    required: true
+    description: Slack message title
+  slack_username:
+    required: true
+    description: Slack username
+secrets:
+  slack_token:
+    required: true
+    description: Slack token to send notification
+
+runs:
+  using: "composite"
+  steps:
+    - name: Notify
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: ${{ inputs.slack_channel }}
+        SLACK_COLOR: ${{ inputs.slack_color }}
+        SLACK_MESSAGE: ${{ inputs.slack_message}}
+        SLACK_TITLE: ${{ inputs.slack_title }}
+        SLACK_WEBHOOK: ${{ secrets.slack_token }}
+        SLACK_ICON: https://www.pypestream.com/wp-content/uploads/favicon.png
+        MSG_MINIMAL: false
+        SLACK_USERNAME: ${{ inputs.slack_username }}
+        SLACK_FOOTER: Powered by Pypestream
