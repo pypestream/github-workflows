@@ -22,4 +22,4 @@ runs:
       if: ${{ inputs.debug == true }}
       with:
         name: VPN logs
-        path: .github/vpn.log
+        path: ./vpn.log
