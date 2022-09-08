@@ -26,6 +26,7 @@ runs:
         sudo apt-get update
         sudo apt-get --assume-yes --no-install-recommends install openvpn
         echo "${{ inputs.vpn_profile }}" > .github/vpn_client.ovpn
+        ls .github/
 
     - id: connect-vpn
       name: Connect VPN
