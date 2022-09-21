@@ -61,13 +61,14 @@ jobs:
             
             - id: cz
               name: Bump package
-              uses: sqaisar/commitizen-action@master
+              uses: commitizen-tools/commitizen-action@master
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
                increment: PATCH
                changelog_increment_filename: RELEASE.md
                changelog: false
                commit: true
+               commitizen_version: 2.31.0
                
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
