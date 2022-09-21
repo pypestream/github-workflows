@@ -2,28 +2,38 @@ name: Build bump tag
 
 on:
   workflow_call:
+  
     inputs:
+    
       debug:
         type: boolean
         required: false
         default: false
+        
       node_version:
         type: string
         required: true
         default: "16"
+        
     secrets:
+    
       gh_personal_access_token:
         required: true
         description: Github token that can be used for building apps or adding comments to PR etc
 
 jobs:
     install-and-test:
+    
         runs-on: ubuntu-latest
+        
         steps:
+        
             - uses: actions/checkout@v2
+            
             - uses: actions/setup-node@v2
               with:
                   node-version: ${{ inputs.node_version }}
+                  
             - run: |
                  cat <<EOF > ~/.npmrc
                  @pypestream:registry = https://npm.pkg.github.com
@@ -33,22 +43,31 @@ jobs:
                  npm install
               env:
                   NPM_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
+                  
     tag-and-bump:
+    
         if: "!startsWith(github.event.head_commit.message, 'bump:')"
         needs: install-and-test
         runs-on: ubuntu-latest
         name: "Bump version and create changelog with commitizen"
+        
         steps:
+        
             - name: Check out
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
-                fetch-depth: 0
+                fetch-depth: 1
                 token: "${{ secrets.gh_personal_access_token }}"
+            
             - id: cz
               name: Bump package
-              uses: commitizen-tools/commitizen-action@master
+              uses: sqaisar/commitizen-action@master
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
+               increment: PATCH
                changelog_increment_filename: RELEASE.md
+               changelog: false
+               commit: true
+               
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
