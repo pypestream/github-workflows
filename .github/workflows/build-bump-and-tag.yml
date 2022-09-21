@@ -61,7 +61,7 @@ jobs:
             
             - id: cz
               name: Bump package
-              uses: sqaisar/commitizen-action@sqaisar-patch-1
+              uses: sqaisar/commitizen-action@master
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
                increment: PATCH
