@@ -44,11 +44,14 @@ jobs:
               with:
                 fetch-depth: 0
                 token: "${{ secrets.gh_personal_access_token }}"
+            - name: Add all
+              run: git add .
             - id: cz
               name: Bump package
               uses: commitizen-tools/commitizen-action@master
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
+               increment: MINOR
                changelog_increment_filename: RELEASE.md
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
