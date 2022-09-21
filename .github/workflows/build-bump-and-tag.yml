@@ -40,7 +40,7 @@ jobs:
                   NPM_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
     tag-and-bump:
         if: "!startsWith(github.event.head_commit.message, 'bump:')"
-        needs: install-and-test
+        #needs: install-and-test
         runs-on: ubuntu-latest
         name: "Bump version and create changelog with commitizen"
         steps:
