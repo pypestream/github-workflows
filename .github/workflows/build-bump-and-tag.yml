@@ -2,33 +2,38 @@ name: Build bump tag
 
 on:
   workflow_call:
+  
     inputs:
+    
       debug:
         type: boolean
         required: false
         default: false
+        
       node_version:
         type: string
         required: true
         default: "16"
-      target_branch:
-        required: true
-        type: string
-        default: "master"
+        
     secrets:
+    
       gh_personal_access_token:
         required: true
         description: Github token that can be used for building apps or adding comments to PR etc
 
 jobs:
     install-and-test:
+    
         runs-on: ubuntu-latest
-        if: false
+        
         steps:
+        
             - uses: actions/checkout@v2
+            
             - uses: actions/setup-node@v2
               with:
                   node-version: ${{ inputs.node_version }}
+                  
             - run: |
                  cat <<EOF > ~/.npmrc
                  @pypestream:registry = https://npm.pkg.github.com
@@ -38,19 +43,22 @@ jobs:
                  npm install
               env:
                   NPM_AUTH_TOKEN: ${{ secrets.gh_personal_access_token }}
+                  
     tag-and-bump:
+    
         if: "!startsWith(github.event.head_commit.message, 'bump:')"
-        #needs: install-and-test
+        needs: install-and-test
         runs-on: ubuntu-latest
         name: "Bump version and create changelog with commitizen"
+        
         steps:
+        
             - name: Check out
               uses: actions/checkout@v3
               with:
                 fetch-depth: 1
                 token: "${{ secrets.gh_personal_access_token }}"
-            - name: Add all
-              run: git add .
+            
             - id: cz
               name: Bump package
               uses: sqaisar/commitizen-action@sqaisar-patch-1
@@ -60,5 +68,6 @@ jobs:
                changelog_increment_filename: RELEASE.md
                changelog: false
                commit: true
+               
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
