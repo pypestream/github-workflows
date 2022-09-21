@@ -11,6 +11,10 @@ on:
         type: string
         required: true
         default: "16"
+      target_branch:
+        required: true
+        type: string
+        default: "master"
     secrets:
       gh_personal_access_token:
         required: true
@@ -40,9 +44,9 @@ jobs:
         name: "Bump version and create changelog with commitizen"
         steps:
             - name: Check out
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
-                fetch-depth: 0
+                fetch-depth: 1
                 token: "${{ secrets.gh_personal_access_token }}"
             - name: Add all
               run: git add .
@@ -51,7 +55,8 @@ jobs:
               uses: commitizen-tools/commitizen-action@master
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
-               increment: MINOR
+               increment: PATCH
                changelog_increment_filename: RELEASE.md
+               commit: true
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
