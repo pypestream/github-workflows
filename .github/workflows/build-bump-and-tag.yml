@@ -52,7 +52,7 @@ jobs:
               run: git add .
             - id: cz
               name: Bump package
-              uses: commitizen-tools/commitizen-action@master
+              uses: sqaisar/commitizen-action@sqaisar-patch-1
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
                increment: PATCH
