@@ -65,8 +65,8 @@ jobs:
               with:
                github_token: ${{ secrets.gh_personal_access_token }}
                increment: PATCH
-               changelog_increment_filename: RELEASE.md
                commitizen_version: 2.31.0
+               changelog: false
                
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
