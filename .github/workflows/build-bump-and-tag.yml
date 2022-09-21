@@ -57,6 +57,7 @@ jobs:
                github_token: ${{ secrets.gh_personal_access_token }}
                increment: PATCH
                changelog_increment_filename: RELEASE.md
+               changelog: false
                commit: true
             - name: Print Version
               run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
