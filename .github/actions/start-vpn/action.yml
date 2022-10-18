@@ -36,7 +36,6 @@ runs:
       name: Connect VPN
       shell: bash
       run: |
-        sudo openvpn --config ".github/vpn_client.ovpn" --log ".github/vpn.log" --daemon
         http_code=$(curl -LI --connect-timeout 5 --max-time 10 --retry 10 --retry-delay 1 --retry-max-time 40 https://${{ inputs.registry_url }} -o /dev/null -w '%{http_code}\n' -s)
         if [ ${http_code} -eq 200 ]; then
             echo "::set-output name=IS_VPN_CONNECTED::true"
