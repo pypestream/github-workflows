@@ -19,7 +19,7 @@ runs:
 
     - name: Upload VPN logs
       uses: actions/upload-artifact@v2
-      if: ${{ inputs.debug == true }}
+      #if: ${{ inputs.debug == true }}
       with:
         name: VPN logs
         path: .github/vpn.log
