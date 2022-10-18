@@ -24,9 +24,14 @@ runs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get --assume-yes --no-install-recommends install openvpn
+        sudo apt-get --assume-yes --no-install-recommends install openvpn openvpn-systemd-resolved
         echo "${{ inputs.vpn_profile }}" > .github/vpn_client.ovpn
-
+    
+    - name: Connect VPN
+      uses:
+      with: "kota65535/github-openvpn-connect-action@v2"
+        config_file: .github/vpn_client.ovpn
+    
     - id: connect-vpn
       name: Connect VPN
       shell: bash
