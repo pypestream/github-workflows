@@ -42,9 +42,9 @@ runs:
 
         for env in "${environments[@]}"; do
           if [ "$env" == "${environments[0]}" ]; then
-            changes="$changes\"app-versions.${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
+            changes="$changes\"app-versions-${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
           else
-            changes="$changes,\"app-versions.${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
+            changes="$changes,\"app-versions-${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
           fi
         done
 
