@@ -1,0 +1,68 @@
+name: 'Update application deployment'
+description: 'Updates application version using argocd repository'
+inputs:
+  githubToken:
+    required: true
+    description: Github token to clone repository
+  appName:
+    required: true
+    description: Application path in the deployment repository app.<name>
+  version:
+    required: true
+    description: Version to update
+  environments:
+    required: true
+    description: Environment where app should be deployed could be multiple e.g (main,candidate)
+  argocdRepository:
+    required: false
+    description: Argocd repository
+    default: pypestream/argocd-deployments
+  argocdBranch:
+    required: true
+    description: Argocd repository branch
+    default: candidate
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Checkout deployment repository
+      uses: actions/checkout@v4
+      with:
+        repository: pypestream/argocd-deployments
+        token: ${{ inputs.githubToken }}
+        path: deployment-repo
+
+    - name: Determine changes based on environment input
+      id: determine_changes
+      shell: bash
+      run: |
+        environments=(${{ inputs.environments }})
+        changes="{"
+
+        for env in "${environments[@]}"; do
+          if [ "$env" == "${environments[0]}" ]; then
+            changes="$changes\"app-versions.${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ needs.release.outputs.new-tag }}\" }"
+          else
+            changes="$changes,\"app-versions.${env}.yml\": { \"apps.pypestreamAdmin.version\": \"${{ needs.release.outputs.new-tag }}\" }"
+          fi
+        done
+
+        changes="$changes}"
+
+        echo "changes=$changes" >> $GITHUB_ENV
+
+    - name: Update version in YAML files
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        token: ${{ inputs.githubToken }}
+        branch: deploy/${{ inputs.appName }}-${{ inputs.environments }}-${{ inputs.version }}
+        labels: automerge
+        workDir: deployment-repo
+        message: 'Updated ${{ inputs.appName }} version in ${{ inputs.environments }} with ${{ inputs.version }}'
+        createPR: true
+        valueFile: 'app-versions.yml'
+        repository: ${{ inputs.argocdRepository }}
+        targetBranch: candidate
+        masterBranchName: candidate
+        changes: ${{ env.changes }}
