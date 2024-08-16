@@ -62,7 +62,6 @@ runs:
         workDir: deployment-repo
         message: 'Updated ${{ inputs.appName }} version in ${{ inputs.environment }} with ${{ inputs.version }}'
         createPR: true
-        valueFile: 'app-versions.yml'
         repository: ${{ inputs.argocdRepository }}
         targetBranch: candidate
         masterBranchName: candidate
