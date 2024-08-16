@@ -10,7 +10,7 @@ inputs:
   version:
     required: true
     description: Version to update
-  environments:
+  environment:
     required: true
     description: Environment where app should be deployed could be multiple e.g (main,candidate)
   argocdRepository:
@@ -37,7 +37,7 @@ runs:
       id: determine_changes
       shell: bash
       run: |
-        environments=(${{ inputs.environments }})
+        environments=(${{ inputs.environment }})
         changes="{"
 
         for env in "${environments[@]}"; do
@@ -56,10 +56,10 @@ runs:
       uses: fjogeleit/yaml-update-action@main
       with:
         token: ${{ inputs.githubToken }}
-        branch: deploy/${{ inputs.appName }}-${{ inputs.environments }}-${{ inputs.version }}
+        branch: deploy/${{ inputs.appName }}-${{ inputs.environment }}-${{ inputs.version }}
         labels: automerge
         workDir: deployment-repo
-        message: 'Updated ${{ inputs.appName }} version in ${{ inputs.environments }} with ${{ inputs.version }}'
+        message: 'Updated ${{ inputs.appName }} version in ${{ inputs.environment }} with ${{ inputs.version }}'
         createPR: true
         valueFile: 'app-versions.yml'
         repository: ${{ inputs.argocdRepository }}
