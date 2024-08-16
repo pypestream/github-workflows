@@ -37,7 +37,8 @@ runs:
       id: determine_changes
       shell: bash
       run: |
-        environments=(${{ inputs.environment }})
+        IFS=',' read -r -a environments <<< "${{ inputs.environment }}"
+        
         changes="{"
 
         for env in "${environments[@]}"; do
