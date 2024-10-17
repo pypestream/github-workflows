@@ -28,9 +28,9 @@ jobs:
         if: "!startsWith(github.event.head_commit.message, 'bump:')"
         steps:
         
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             
-            - uses: actions/setup-node@v2
+            - uses: actions/setup-node@v4
               with:
                   node-version: ${{ inputs.node_version }}
                   
@@ -54,7 +54,7 @@ jobs:
         steps:
         
             - name: Check out
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
                 fetch-depth: 1
                 token: "${{ secrets.gh_personal_access_token }}"

@@ -46,7 +46,7 @@ jobs:
       name: Deploying to surge
 
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - id: output_vars
           run: |
@@ -126,7 +126,7 @@ jobs:
       name: Teardown review app
 
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - id: reviewapp_link
           run: |
