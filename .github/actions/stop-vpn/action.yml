@@ -18,7 +18,7 @@ runs:
         sudo killall openvpn
 
     - name: Upload VPN logs
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ inputs.debug == true }}
       with:
         name: VPN logs
