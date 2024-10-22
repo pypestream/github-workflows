@@ -39,7 +39,7 @@ runs:
       run: |
         REPLACED_ENVIRONMENT=${{ inputs.environment }}
         REPLACED_ENVIRONMENT="${REPLACED_ENVIRONMENT//release/uat}"
-        IFS=',' read -r -a environments <<< "${{ inputs.environment }}"
+        IFS=',' read -r -a environments <<< "$REPLACED_ENVIRONMENT"
         
         changes="{"
 
