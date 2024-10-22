@@ -37,6 +37,8 @@ runs:
       id: determine_changes
       shell: bash
       run: |
+        REPLACED_ENVIRONMENT=${{ inputs.environment }}
+        REPLACED_ENVIRONMENT="${REPLACED_ENVIRONMENT//release/uat}"
         IFS=',' read -r -a environments <<< "${{ inputs.environment }}"
         
         changes="{"
