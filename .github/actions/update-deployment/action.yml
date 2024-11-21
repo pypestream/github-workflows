@@ -63,6 +63,7 @@ runs:
         echo "changes=$changes" >> $GITHUB_ENV
 
     - name: Printe Changes
+      shell: bash
       run: |
         echo ${{ env.changes }}
 
