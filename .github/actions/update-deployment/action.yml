@@ -45,22 +45,32 @@ runs:
         REPLACED_ENVIRONMENT="${REPLACED_ENVIRONMENT//release/uat}"
         IFS=',' read -r -a environments <<< "$REPLACED_ENVIRONMENT"
         IFS=',' read -r -a appNames <<< "${{ inputs.appName }}"
-    
+
         changes="{"
-    
+
         for env in "${environments[@]}"; do
+          env_key="app-versions-${env}.yml"
+          app_versions=""
+
           for app in "${appNames[@]}"; do
-            if [ "$changes" == "{" ]; then
-              changes="$changes\"app-versions-${env}.yml\": { \"apps.$app.version\": \"${{ inputs.version }}\" }"
+            if [ -z "$app_versions" ]; then
+              app_versions="\"apps.$app.version\": \"${{ inputs.version }}\""
             else
-              changes="$changes,\"app-versions-${env}.yml\": { \"apps.$app.version\": \"${{ inputs.version }}\" }"
+              app_versions="$app_versions, \"apps.$app.version\": \"${{ inputs.version }}\""
             fi
           done
+
+          if [ "$changes" == "{" ]; then
+            changes="$changes\"$env_key\": { $app_versions }"
+          else
+            changes="$changes, \"$env_key\": { $app_versions }"
+          fi
         done
-    
+
         changes="$changes}"
-    
+
         echo "changes=$changes" >> $GITHUB_ENV
+
 
     - name: Printe Changes
       shell: bash
