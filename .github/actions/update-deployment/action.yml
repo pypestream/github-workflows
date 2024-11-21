@@ -21,6 +21,10 @@ inputs:
     required: true
     description: Argocd repository branch
     default: candidate
+  dryRun:
+    required: false
+    default: false
+    description: Dry run to test the shared action
 
 runs:
   using: "composite"
@@ -40,14 +44,26 @@ runs:
         REPLACED_ENVIRONMENT=${{ inputs.environment }}
         REPLACED_ENVIRONMENT="${REPLACED_ENVIRONMENT//release/uat}"
         IFS=',' read -r -a environments <<< "$REPLACED_ENVIRONMENT"
-        
+        IFS=',' read -r -a appNames <<< "${{ inputs.appName }}"
+
         changes="{"
 
         for env in "${environments[@]}"; do
-          if [ "$env" == "${environments[0]}" ]; then
-            changes="$changes\"app-versions-${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
+          env_key="app-versions-${env}.yml"
+          app_versions=""
+
+          for app in "${appNames[@]}"; do
+            if [ -z "$app_versions" ]; then
+              app_versions="\"apps.$app.version\": \"${{ inputs.version }}\""
+            else
+              app_versions="$app_versions, \"apps.$app.version\": \"${{ inputs.version }}\""
+            fi
+          done
+
+          if [ "$changes" == "{" ]; then
+            changes="$changes\"$env_key\": { $app_versions }"
           else
-            changes="$changes,\"app-versions-${env}.yml\": { \"apps.${{ inputs.appName }}.version\": \"${{ inputs.version }}\" }"
+            changes="$changes, \"$env_key\": { $app_versions }"
           fi
         done
 
@@ -55,8 +71,15 @@ runs:
 
         echo "changes=$changes" >> $GITHUB_ENV
 
+
+    - name: Printe Changes
+      shell: bash
+      run: |
+        echo ${{ env.changes }}
+
     - name: Update version in YAML files
       uses: fjogeleit/yaml-update-action@main
+      if: ${{ inputs.dryRun == 'false' }}
       with:
         token: ${{ inputs.githubToken }}
         branch: deploy/${{ inputs.appName }}-${{ inputs.environment }}-${{ inputs.version }}
